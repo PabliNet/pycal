@@ -21,6 +21,8 @@ Además se puede elegir el mes anterior, mes siguiente, año anterior o año sig
 **Para instalar «pycal»:**  
 `# python pycal.py--install`
 
+Una vez instalado con sólo teclar `pycal` es suficiente.
+
 **Para desinstalar «pycal»:**  
 `# python3 pycal.py --uninstall`
 
