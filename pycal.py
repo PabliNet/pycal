@@ -5,7 +5,7 @@ from os.path import abspath, exists
 from shutil import copy
 from datetime import date, datetime
 from locale import LC_ALL, setlocale
-from calendar import monthcalendar
+from calendar import day_abbr, monthcalendar
 
 def fEsHoy (dia=0, color='1', hoy=date.today().strftime('%Y-%m-%d'), ayuda=False):
     hoy = hoy.split('-')
@@ -332,7 +332,10 @@ elif paramFecha == date.today().strftime('%Y-%m'):
 else:
     fecha = fecha + '-34'
     resaltado = False
-dias = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do']
+for nomDia in tuple(day_abbr):
+    if not 'dias' in locals():
+        dias = []
+    dias.append(nomDia[:2].capitalize())
 if paramFecha.count('/') == 0:
     tuplaAgnoMes = tuple(map(int, paramFecha.split('-')))
     if len(paramFecha.split('-')) > 1:
