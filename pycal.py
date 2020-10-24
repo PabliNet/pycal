@@ -89,7 +89,7 @@ def ayuda (ins):
         d.pop('--install')
     else:
         exit()
-    print (f'\x1b[0mModo de empleo: {argv[0]} [ALINEACIÓN] [AAAA-MM-DD] [COLOR]\n  o bien:  {argv[0]} [ALINEACIÓN] [AAAA-MM] [COLOR]\n  o bien:  {argv[0]} [ALINEACIÓN] [AAAA] [COLOR]\n  o bien:  {argv[0]} [ALINEACIÓN] [AAAA] [COLOR]\n  o bien:  {argv[0]} [ALINEACIÓN] [AAAA/MM/DD] [COLOR]', 'Muestra un calendario con el día actual resaltado.', 'Alineación:', sep='\n\n')
+    print (f'\x1b[0mModo de empleo: {argv[0]} [ALINEACIÓN] [AAAA-MM-DD] [COLOR]\n  o bien:  {argv[0]} [ALINEACIÓN] [AAAA-MM] [COLOR]\n  o bien:  {argv[0]} [ALINEACIÓN] [AAAA] [COLOR]', 'Muestra un calendario con el día actual resaltado.', 'Alineación:', sep='\n\n')
     for a in tuple(fEsHoy(ayuda=True)[0].keys()):
         print (format('  ' + a, '<18'), f'alinear {fEsHoy(ayuda=True)[0][a]}')
     print ('\nOpciones:')
@@ -118,6 +118,7 @@ def err (cod):
 
 def validarFecha (cadena):
     if cadena.count('/') != 0 and cadena.count('-') == 0:
+        err(2)
         cadena = cadena.replace('/', '-')
     try:
         tupla = tuple(map(int, cadena.split('-')))
@@ -260,216 +261,217 @@ def deltaFecha (opcion):
 
 setlocale(LC_ALL, '')
 
-for i in range(1, len(argv)):
-    if argv[i] in ('-y', '-Y', '-M', '+Y', '+M'):
-        argv[i] = deltaFecha(argv[i])
+if __name__ == "__main__":
+    for i in range(1, len(argv)):
+        if argv[i] in ('-y', '-Y', '-M', '+Y', '+M'):
+            argv[i] = deltaFecha(argv[i])
 
-cmd = argv[0]
-paramHorizontal = '-l'
-paramFecha = fecha = date.today().strftime('%Y-%m')
-paramColor = '1'
+    cmd = argv[0]
+    paramHorizontal = '-l'
+    paramFecha = fecha = date.today().strftime('%Y-%m')
+    paramColor = '1'
 
-destino = comando = '/usr/local/bin/pycal'
+    destino = comando = '/usr/local/bin/pycal'
 
-if exists(comando):
-    installer = '--uninstall'
-else:
-    installer = '--install'
-
-if len(argv) > 1:
-    if not (len(argv) == 2 and argv[1] in ('--help', '--version', installer)):
-        argv.pop(0)
-        argv.sort()
-        contparam = len(argv)
+    if exists(comando):
+        installer = '--uninstall'
     else:
-        contparam = 1
-else:
-    contparam = 0
+        installer = '--install'
 
-if contparam in range(2, 4):
-    argv.sort()
-    if argv[-2] in ('0', '1'):
-        aux = [argv[-1], argv[-2]]
-        argv = argv[:-2]
-        argv.extend(aux)
-elif contparam > 3:
-    err(3)
+    if len(argv) > 1:
+        if not (len(argv) == 2 and argv[1] in ('--help', '--version', installer)):
+            argv.pop(0)
+            argv.sort()
+            contparam = len(argv)
+        else:
+            contparam = 1
+    else:
+        contparam = 0
 
-if contparam > 0:
-    validado = validar(argv)
-
-if contparam == 1:
-    if validado[0] == 'a':
-        paramHorizontal = validado[1]
-    elif validado[0] == 'f':
-        paramFecha = validado[1]
-    elif validado[0] == 'c':
-        paramColor = validado[1]
-elif contparam == 2:
-    if validado[0] == 'af':
-        paramHorizontal, paramFecha = validado[1:]
-    elif validado[0] == 'ac':
-        paramHorizontal, paramColor = validado[1:]
-    elif validado[0] == 'fc':
-        paramFecha, paramColor = validado[1:]
-elif contparam == 3:
-    paramHorizontal, paramFecha, paramColor = validado
-elif len(argv) > 3:
+    if contparam in range(2, 4):
+        argv.sort()
+        if argv[-2] in ('0', '1'):
+            aux = [argv[-1], argv[-2]]
+            argv = argv[:-2]
+            argv.extend(aux)
+    elif contparam > 3:
         err(3)
 
-if paramHorizontal == '-r':
-    espacio = ' ' * (get_terminal_size().columns - 20)
-else:
-    espacio = ''
+    if contparam > 0:
+        validado = validar(argv)
 
-if len(paramFecha.split('-')) == 3:
-    fecha = paramFecha
-    paramFecha = paramFecha[:paramFecha.rfind('-')]
-    resaltado = True
-elif paramFecha == date.today().strftime('%Y-%m'):
-    fecha = date.today().strftime('%Y-%m-%d')
-    resaltado = True
-else:
-    fecha = fecha + '-34'
-    resaltado = False
-for nomDia in tuple(day_abbr):
-    if not 'dias' in locals():
-        dias = []
-    dias.append(nomDia[:2].capitalize())
-if paramFecha.count('/') == 0:
-    tuplaAgnoMes = tuple(map(int, paramFecha.split('-')))
-    if len(paramFecha.split('-')) > 1:
-        mes = date.today().strftime("%B %Y").capitalize()
-        mes = format(datetime.strftime((datetime.strptime(paramFecha, '%Y-%m')), '%B %Y').capitalize(), '^20')
-        print (format(mes, alinear(paramHorizontal)))
-        semanas = monthcalendar(*tuplaAgnoMes)
+    if contparam == 1:
+        if validado[0] == 'a':
+            paramHorizontal = validado[1]
+        elif validado[0] == 'f':
+            paramFecha = validado[1]
+        elif validado[0] == 'c':
+            paramColor = validado[1]
+    elif contparam == 2:
+        if validado[0] == 'af':
+            paramHorizontal, paramFecha = validado[1:]
+        elif validado[0] == 'ac':
+            paramHorizontal, paramColor = validado[1:]
+        elif validado[0] == 'fc':
+            paramFecha, paramColor = validado[1:]
+    elif contparam == 3:
+        paramHorizontal, paramFecha, paramColor = validado
+    elif len(argv) > 3:
+            err(3)
 
-strMes = [dias.copy()]
-
-c = 0
-if len(paramFecha.split('-')) in (2, 3):
-    strMes.extend(fMes(semanas))
-    listSemana = [dias]
-    listSemana.extend(semanas)
-    for semana in printcal(strMes, listSemana):
-        if c == 0:
-            print ('\x1b[1m' + format(semana, alinear(paramHorizontal)) + '\x1b[0m')
-            chrs = len(semana)
-        else:
-            dif = len(semana) - chrs
-            print(format(semana, alinear(paramHorizontal, dif)))
-        c += 1
-elif len(paramFecha.split('-')) == 1:
-    if paramFecha.count('/') == 2:
-        paramFecha = paramFecha.replace('/', '-')
-        resaltado = True
-    elif not paramFecha.count('/') in (0, 2):
-        err(5)
-    if paramFecha.split('-')[0] == date.today().strftime('%Y'):
-        paramFecha = date.today().strftime('%Y-%m-%d')
-        resaltado = True
-    if resaltado:
-        sAno, sMes, sDia = tuple(map(int, paramFecha.split('-')))
-        sMes -= 1
+    if paramHorizontal == '-r':
+        espacio = ' ' * (get_terminal_size().columns - 20)
     else:
-        sAno = int(paramFecha.split('-')[0])
-    _1, _2, _3, _4, _6 = 20, 42, 64, 86, 130
-    for i in range(1, 13):
-        semanasMes = [dias.copy()]
-        semanasMes.extend(monthcalendar(sAno, i))
-        if not 'meses' in locals():
-            meses = meses = []
-        meses.append(semanasMes)
-    for i in range(0, len(meses)):
-        if not 'ano' in locals():
-            ano = []
-        ano.append(fMes(meses[i]))
-        nombreMes = [format(datetime.strftime((datetime.strptime(str(i+1), '%m')), '%B').capitalize(), '^20')]
-        ano[i].insert(0, nombreMes)
-    if resaltado:
-        for i in range(0, len(meses[sMes])):
-            if sDia in meses[sMes][i]:
-                ano[sMes][i+1][meses[sMes][i].index(sDia)] = fEsHoy(color=paramColor, ayuda=True)[2][0] + ano[sMes][i+1][meses[sMes][i].index(sDia)] + fEsHoy(color='0', ayuda=True)[2][0]
-                sem = i
-    if get_terminal_size().columns < 20:
-        err(4)
-    elif get_terminal_size().columns in range(20, 42):
-        # Un mes por fila = 1
-        formatAno = format(sAno, '^20')
-        print (format(formatAno, alinear(paramHorizontal)))
-        enter = True
-        for mes in ano:
-            for semana in mes:
-                if ' '.join(semana).replace(' ', '').isalpha():
-                    if enter:
-                        print ()
-                        enter = False
-                    renglon = format(' '.join(semana), alinear(paramHorizontal, len(' '.join(semana)) - 20))
-                    print (f'\x1b[0;1m{renglon}\x1b[0m')
-                else:
-                    enter = True
-                    print (format(' '.join(semana), alinear(paramHorizontal, len(' '.join(semana)) - 20)))
-        exit()
-    elif get_terminal_size().columns in range(42, 64):
-        # Dos meses por fila
-        periodos = [
-            igualarSemanas(ano, 0, 2),
-            igualarSemanas(ano, 2, 4),
-            igualarSemanas(ano, 4, 6),
-            igualarSemanas(ano, 6, 8),
-            igualarSemanas(ano, 8, 10),
-            igualarSemanas(ano, 10, 12)
-        ]
-        cc = 42
-    elif get_terminal_size().columns in range(64, 86):
-        # Tres meses por fila = 3
-        periodos = [
-            igualarSemanas(ano, 0,3),
-            igualarSemanas(ano, 3,6),
-            igualarSemanas(ano, 6, 9),
-            igualarSemanas(ano, 9, 12)
-        ]
-        cc =64
-    elif get_terminal_size().columns in range(86, 130):
-        # mesesxfila = 4
-        periodos = [
-            igualarSemanas(ano, 0, 4),
-            igualarSemanas(ano, 4, 8),
-            igualarSemanas(ano, 8,12)
-        ]
-        cc = 86
-    elif get_terminal_size().columns > 129:
-        # mesesxfila = 6
-        periodos = [
-            igualarSemanas(ano, 0, 6),
-            igualarSemanas(ano, 6, 12)
-        ]
-        cc = 130
-    mesdiv = 6
-    for i in range(0, len(periodos)):
-        for j in range(0, len(periodos[i])):
-            for k in range(0, len(periodos[i][j])):
-                periodos[i][j][k] = ' '.join(periodos[i][j][k])
-    fila = []
-    filas = []
-    for periodo in periodos:
-        nFila = 0
-        while nFila < len(periodo[0]):
-            for mes in range(0, len(periodo)):
-                fila.append(periodo[mes][nFila])
-            filas.append(fila.copy())
-            fila.clear()
-            nFila += 1
-    formatAno = format(sAno, '^' + str(cc))
-    print (format(formatAno, alinear(paramHorizontal)))
-    enter = 0
-    for _Fila in filas:
-        if '  '.join(_Fila).replace(' ', '').isalpha():
-            if enter == 0:
-                print()
-            renglon = format('  '.join(_Fila), alinear(paramHorizontal, len('  '.join(_Fila)) - cc))
-            print(f'\x1b[0;1m{renglon}\x1b[0m')
-            enter += 1
+        espacio = ''
+
+    if len(paramFecha.split('-')) == 3:
+        fecha = paramFecha
+        paramFecha = paramFecha[:paramFecha.rfind('-')]
+        resaltado = True
+    elif paramFecha == date.today().strftime('%Y-%m'):
+        fecha = date.today().strftime('%Y-%m-%d')
+        resaltado = True
+    else:
+        fecha = fecha + '-34'
+        resaltado = False
+    for nomDia in tuple(day_abbr):
+        if not 'dias' in locals():
+            dias = []
+        dias.append(nomDia[:2].capitalize())
+    if paramFecha.count('/') == 0:
+        tuplaAgnoMes = tuple(map(int, paramFecha.split('-')))
+        if len(paramFecha.split('-')) > 1:
+            mes = date.today().strftime("%B %Y").capitalize()
+            mes = format(datetime.strftime((datetime.strptime(paramFecha, '%Y-%m')), '%B %Y').capitalize(), '^20')
+            print (format(mes, alinear(paramHorizontal)))
+            semanas = monthcalendar(*tuplaAgnoMes)
+
+    strMes = [dias.copy()]
+
+    c = 0
+    if len(paramFecha.split('-')) in (2, 3):
+        strMes.extend(fMes(semanas))
+        listSemana = [dias]
+        listSemana.extend(semanas)
+        for semana in printcal(strMes, listSemana):
+            if c == 0:
+                print ('\x1b[1m' + format(semana, alinear(paramHorizontal)) + '\x1b[0m')
+                chrs = len(semana)
+            else:
+                dif = len(semana) - chrs
+                print(format(semana, alinear(paramHorizontal, dif)))
+            c += 1
+    elif len(paramFecha.split('-')) == 1:
+        if paramFecha.count('/') == 2:
+            paramFecha = paramFecha.replace('/', '-')
+            resaltado = True
+        elif not paramFecha.count('/') in (0, 2):
+            err(5)
+        if paramFecha.split('-')[0] == date.today().strftime('%Y'):
+            paramFecha = date.today().strftime('%Y-%m-%d')
+            resaltado = True
+        if resaltado:
+            sAno, sMes, sDia = tuple(map(int, paramFecha.split('-')))
+            sMes -= 1
         else:
-            enter = 0
-            print(format('  '.join(_Fila), alinear(paramHorizontal, len('  '.join(_Fila)) - cc)))
+            sAno = int(paramFecha.split('-')[0])
+        _1, _2, _3, _4, _6 = 20, 42, 64, 86, 130
+        for i in range(1, 13):
+            semanasMes = [dias.copy()]
+            semanasMes.extend(monthcalendar(sAno, i))
+            if not 'meses' in locals():
+                meses = meses = []
+            meses.append(semanasMes)
+        for i in range(0, len(meses)):
+            if not 'ano' in locals():
+                ano = []
+            ano.append(fMes(meses[i]))
+            nombreMes = [format(datetime.strftime((datetime.strptime(str(i+1), '%m')), '%B').capitalize(), '^20')]
+            ano[i].insert(0, nombreMes)
+        if resaltado:
+            for i in range(0, len(meses[sMes])):
+                if sDia in meses[sMes][i]:
+                    ano[sMes][i+1][meses[sMes][i].index(sDia)] = fEsHoy(color=paramColor, ayuda=True)[2][0] + ano[sMes][i+1][meses[sMes][i].index(sDia)] + fEsHoy(color='0', ayuda=True)[2][0]
+                    sem = i
+        if get_terminal_size().columns < 20:
+            err(4)
+        elif get_terminal_size().columns in range(20, 42):
+            # Un mes por fila = 1
+            formatAno = format(sAno, '^20')
+            print (format(formatAno, alinear(paramHorizontal)))
+            enter = True
+            for mes in ano:
+                for semana in mes:
+                    if ' '.join(semana).replace(' ', '').isalpha():
+                        if enter:
+                            print ()
+                            enter = False
+                        renglon = format(' '.join(semana), alinear(paramHorizontal, len(' '.join(semana)) - 20))
+                        print (f'\x1b[0;1m{renglon}\x1b[0m')
+                    else:
+                        enter = True
+                        print (format(' '.join(semana), alinear(paramHorizontal, len(' '.join(semana)) - 20)))
+            exit()
+        elif get_terminal_size().columns in range(42, 64):
+            # Dos meses por fila
+            periodos = [
+                igualarSemanas(ano, 0, 2),
+                igualarSemanas(ano, 2, 4),
+                igualarSemanas(ano, 4, 6),
+                igualarSemanas(ano, 6, 8),
+                igualarSemanas(ano, 8, 10),
+                igualarSemanas(ano, 10, 12)
+            ]
+            cc = 42
+        elif get_terminal_size().columns in range(64, 86):
+            # Tres meses por fila = 3
+            periodos = [
+                igualarSemanas(ano, 0,3),
+                igualarSemanas(ano, 3,6),
+                igualarSemanas(ano, 6, 9),
+                igualarSemanas(ano, 9, 12)
+            ]
+            cc =64
+        elif get_terminal_size().columns in range(86, 130):
+            # mesesxfila = 4
+            periodos = [
+                igualarSemanas(ano, 0, 4),
+                igualarSemanas(ano, 4, 8),
+                igualarSemanas(ano, 8,12)
+            ]
+            cc = 86
+        elif get_terminal_size().columns > 129:
+            # mesesxfila = 6
+            periodos = [
+                igualarSemanas(ano, 0, 6),
+                igualarSemanas(ano, 6, 12)
+            ]
+            cc = 130
+        mesdiv = 6
+        for i in range(0, len(periodos)):
+            for j in range(0, len(periodos[i])):
+                for k in range(0, len(periodos[i][j])):
+                    periodos[i][j][k] = ' '.join(periodos[i][j][k])
+        fila = []
+        filas = []
+        for periodo in periodos:
+            nFila = 0
+            while nFila < len(periodo[0]):
+                for mes in range(0, len(periodo)):
+                    fila.append(periodo[mes][nFila])
+                filas.append(fila.copy())
+                fila.clear()
+                nFila += 1
+        formatAno = format(sAno, '^' + str(cc))
+        print (format(formatAno, alinear(paramHorizontal)))
+        enter = 0
+        for _Fila in filas:
+            if '  '.join(_Fila).replace(' ', '').isalpha():
+                if enter == 0:
+                    print()
+                renglon = format('  '.join(_Fila), alinear(paramHorizontal, len('  '.join(_Fila)) - cc))
+                print(f'\x1b[0;1m{renglon}\x1b[0m')
+                enter += 1
+            else:
+                enter = 0
+                print(format('  '.join(_Fila), alinear(paramHorizontal, len('  '.join(_Fila)) - cc)))
