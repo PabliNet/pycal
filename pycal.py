@@ -5,7 +5,7 @@ from os.path import abspath, exists
 from shutil import copy
 from datetime import date, datetime
 from locale import LC_ALL, setlocale
-from calendar import day_abbr, monthcalendar
+from calendar import monthcalendar
 
 def fEsHoy (dia=0, color='1', hoy=date.today().strftime('%Y-%m-%d'), ayuda=False):
     hoy = hoy.split('-')
@@ -118,7 +118,6 @@ def err (cod):
 
 def validarFecha (cadena):
     if cadena.count('/') != 0 and cadena.count('-') == 0:
-        err(2)
         cadena = cadena.replace('/', '-')
     try:
         tupla = tuple(map(int, cadena.split('-')))
@@ -185,7 +184,7 @@ def validar (lista):
         elif lista[1].lower() == '--help':
             ayuda(installer)
         elif lista[1].lower() == '--version':
-            print (f'pycal 1.0\nCopyright © 2020\n\nDesarrollado por Pablo Alejandro Carravetti')
+            print (f'pycal 1.1\nCopyright © 2020\n\nDesarrollado por Pablo Alejandro Carravetti')
             exit()
         else:
             err(2)
@@ -334,10 +333,7 @@ if __name__ == "__main__":
     else:
         fecha = fecha + '-34'
         resaltado = False
-    for nomDia in tuple(day_abbr):
-        if not 'dias' in locals():
-            dias = []
-        dias.append(nomDia[:2].capitalize())
+    dias = ['Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sa', 'Do']
     if paramFecha.count('/') == 0:
         tuplaAgnoMes = tuple(map(int, paramFecha.split('-')))
         if len(paramFecha.split('-')) > 1:
@@ -365,6 +361,7 @@ if __name__ == "__main__":
         if paramFecha.count('/') == 2:
             paramFecha = paramFecha.replace('/', '-')
             resaltado = True
+            err(2)
         elif not paramFecha.count('/') in (0, 2):
             err(5)
         if paramFecha.split('-')[0] == date.today().strftime('%Y'):
